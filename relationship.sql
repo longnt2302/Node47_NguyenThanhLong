@@ -347,9 +347,32 @@ WHERE o.order_id = 5
 SELECT COUNT(u.user_id) AS 'Số Like', u.user_id, u.full_name FROM users u
 INNER JOIN like_res l ON u.user_id = l.user_id
 GROUP BY u.user_id, u.full_name
-HAVING COUNT(u.user_id) = 1
+# HAVING COUNT(u.user_id) = 1
 
 # Khi tìm điều kiện trên những hàm tổng hợp thì dùng HAVING
 
 ORDER BY COUNT(u.user_id)  DESC
 LIMIT 5
+
+# Tìm 2 nhà hàng có lượt like nhiều nhất
+SELECT r.res_id, r.res_name, COUNT(lr.res_id) AS 'Số Like'
+FROM restaurant r
+JOIN like_res lr ON r.res_id = lr.res_id
+GROUP BY r.res_id, r.res_name
+ORDER BY COUNT(lr.res_id) DESC
+LIMIT 2
+
+# Tìm người đã đặt hàng nhiều nhất
+SELECT u.full_name, COUNT(o.user_id) FROM users u
+INNER JOIN orders o ON u.user_id = o.user_id
+GROUP BY u.full_name
+ORDER BY COUNT(o.user_id) DESC
+LIMIT 1
+
+# Tìm người dùng không hoạt động trong hệ thống
+# (không đặt hàng, không like, không đánh giá nhà hàng).
+SELECT u.user_id ,u.full_name FROM users u
+LEFT JOIN orders o ON o.user_id = u.user_id
+LEFT JOIN like_res lr ON lr.user_id = u.user_id
+LEFT JOIN rate_res rs ON rs.user_id = u.user_id
+WHERE o.user_id IS NULL AND lr.user_id IS NULL AND rs.user_id IS NULL
