@@ -1,11 +1,15 @@
 import express from "express";
 import connect from "./db.js";
+import rootRoutes from "./src/routers/rootRoutes.js";
 
 // tạo object tổng của express
 const app = express();
 
 // thêm Middleware để convert string về json với API POST và PUT
 app.use(express.json());
+
+// import rootRoutes vào index.js
+app.use(rootRoutes);
 
 // viết API hello world
 app.get("/hello-world", (req, res) => {
@@ -33,17 +37,17 @@ app.get("/get-user/:id/:hoTen", (req, res) => {
  * body khi lấy về thì nó thuộc dạng string: ví dụ: {id:3, hoTen: 'long'}
  * Phải sử dụng thêm Middleware để convert string từ body về Json => app.use(express.json());
  */
-app.post("/create-user", (req, res) => {
-  let body = req.body;
-  res.send(body);
-});
+// app.post("/create-user", (req, res) => {
+//   let body = req.body;
+//   res.send(body);
+// });
 
-app.get("/get-user-db", async (req, res) => {
-  const [data] = await connect.query(`
-        SELECT * FROM users
-    `);
-  res.send(data);
-});
+// app.get("/get-user-db", async (req, res) => {
+//   const [data] = await connect.query(`
+//         SELECT * FROM users
+//     `);
+//   res.send(data);
+// });
 
 // tạo data bằng thư viện mysql2
 app.post("/create-user-db", async (req, res) => {
