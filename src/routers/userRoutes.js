@@ -7,6 +7,7 @@ import {
   getUserOrmById,
   createUserOrm,
 } from "../controllers/userControllers.js";
+import { middlewareToken } from "../config/jwt.js";
 
 // define object user routes ( Khởi tạo 1 userRoutes )
 const userRoutes = express.Router();
@@ -23,6 +24,6 @@ userRoutes.get("/get-users-orm", getUserOrm);
 
 userRoutes.get("/get-users-orm/:id", getUserOrmById);
 
-userRoutes.post("/create-users-orm", createUserOrm);
+userRoutes.post("/create-users-orm", middlewareToken, createUserOrm);
 
 export default userRoutes;
