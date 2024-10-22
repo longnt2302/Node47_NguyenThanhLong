@@ -204,4 +204,41 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-export { signUp, login, loginFacebook, forgotPassword };
+const changePassword = async (req, res) => {
+  try {
+    let { email, code, newPass } = req.body;
+
+    // check email có tồn tại trong DB hay không ?
+    let checkEmail = await model.users.findOne({
+      where: { email },
+    });
+
+    if (!checkEmail) return res.status(400).json({ message: "Email is wrong" });
+
+    if (!code) res.status(400).json({ message: "Code is wrong" });
+
+    let checkCode = await model.code.findOne({
+      where: { code },
+    });
+
+    if (!checkCode) return res.status(400).json({ message: "Code is wrong" });
+
+    let hashNewPass = bcrypt.hashSync(newPass, 10);
+    // C1
+    checkEmail.pass_word = hashNewPass;
+    checkEmail.save();
+
+    // C2: dùng function update
+
+    // Huỷ code sau khi đã change password
+    await model.code.destroy({
+      where: { code },
+    });
+
+    return res.status(200).json({ message: "Change password successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "error API change password" });
+  }
+};
+
+export { signUp, login, loginFacebook, forgotPassword, changePassword };
