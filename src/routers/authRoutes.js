@@ -12,10 +12,10 @@ authRoutes.post("/login", login);
 // define API login facebook
 authRoutes.post("/login-facebook", loginFacebook);
 
-// B1: define API forgot-pass
-authRoutes.post("/forgot-pass", forgotPassword);
+// B1: define API forgot-password
+authRoutes.post("/forgot-password", forgotPassword);
 
 // B2: define API change password
-authRoutes.post("/change-pass", changePassword);
+authRoutes.post("/change-password", changePassword);
 
 export default authRoutes;
