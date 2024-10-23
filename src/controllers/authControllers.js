@@ -3,7 +3,7 @@ import sequelize from "../models/connect.js";
 import bcrypt from "bcrypt"; // lib mã hoá password
 import transporter from "../config/transporter.js";
 import jwt from "jsonwebtoken"; // lib tạo token
-import { createToken } from "../config/jwt.js";
+import { createRefToken, createToken } from "../config/jwt.js";
 import crypto from "crypto"; // lib tạo code forgot password
 
 // tạo object model đại diện cho tất cả model của ORM
@@ -89,6 +89,20 @@ const login = async (req, res) => {
 
     // tạo accessToken bằng khoá đối xứng
     let accessToken = createToken(payload);
+
+    // tạo refreshToken
+    let refreshToken = createRefToken(payload);
+
+    // lưu refresh token vào table users
+    await model.users.update({ refresh_token: refreshToken }, { where: { user_id: checkUser.user_id } });
+
+    // gắn refresh token cho cookie của response
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false, // dùng riêng cho localhost
+      samSite: "Lax", // đảm bảo cookie được gửi trong nhiều domain
+      maxAge: 7 * 24 * 60 * 60 * 1000, // thời gian tồn tại là 7 ngày
+    });
 
     return res.status(200).json({ message: "Login successfully", token: accessToken });
     // access token + refresh token
@@ -241,4 +255,28 @@ const changePassword = async (req, res) => {
   }
 };
 
-export { signUp, login, loginFacebook, forgotPassword, changePassword };
+const extendToken = async (req, res) => {
+  try {
+    // lấy refresh token từ cookie của req
+    let refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) return res.status(401).json({ message: "401" });
+
+    // check refresh token trong DB
+    let userRefToken = await model.users.findOne({
+      where: { refresh_token: refreshToken },
+    });
+
+    if (!userRefToken || userRefToken == null) return res.status(401).json({ message: "401" });
+
+    // create new access token
+    let newAccessToken = createToken({
+      userId: userRefToken.user_id,
+    });
+    return res.status(200).json({ message: "Success", token: newAccessToken });
+  } catch (error) {
+    return res.status(500).json({ message: "error API extend token" });
+  }
+};
+
+export { signUp, login, loginFacebook, forgotPassword, changePassword, extendToken };

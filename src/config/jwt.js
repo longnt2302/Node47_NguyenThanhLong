@@ -7,7 +7,14 @@ dotenv.config();
 const createToken = (payload) => {
   return jwt.sign({ payload: payload }, process.env.SECRET_KEY, {
     algorithm: "HS256", // HS256 thuật toán mã hoá với khoá đối xứng
-    expiresIn: "30m", // m: minute, s: second, h: hour, d: day
+    expiresIn: "20s", // m: minute, s: second, h: hour, d: day
+  });
+};
+
+const createRefToken = (payload) => {
+  return jwt.sign({ payload: payload }, process.env.SECRET_KEY, {
+    algorithm: "HS256", // HS256 thuật toán mã hoá với khoá đối xứng
+    expiresIn: "7d", // m: minute, s: second, h: hour, d: day
   });
 };
 
@@ -33,4 +40,4 @@ const middlewareToken = (req, res, next) => {
   }
 };
 
-export { createToken, middlewareToken };
+export { createToken, createRefToken, middlewareToken };

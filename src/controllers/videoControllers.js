@@ -9,7 +9,15 @@ const model = initModels(sequelize);
 
 const getVideos = async (req, res) => {
   try {
-    let data = await model.video.findAll();
+    let page = 3;
+    let size = 4;
+    let index = (page - 1) * size;
+    let data = await model.video.findAll({
+      offset: index,
+      limit: size,
+    });
+    // vd : page: 2, limit: 4
+    // bỏ 4 item đầu tiên, lấy 4 item tiếp theo
     console.log("data: ", data);
     return res.status(200).json(data);
   } catch (error) {

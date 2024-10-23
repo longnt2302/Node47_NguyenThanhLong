@@ -1,5 +1,12 @@
 import express from "express";
-import { signUp, login, loginFacebook, forgotPassword, changePassword } from "../controllers/authControllers.js";
+import {
+  signUp,
+  login,
+  loginFacebook,
+  forgotPassword,
+  changePassword,
+  extendToken,
+} from "../controllers/authControllers.js";
 
 const authRoutes = express.Router();
 
@@ -12,10 +19,13 @@ authRoutes.post("/login", login);
 // define API login facebook
 authRoutes.post("/login-facebook", loginFacebook);
 
-// B1: define API forgot-pass
-authRoutes.post("/forgot-pass", forgotPassword);
+// B1: define API forgot-password
+authRoutes.post("/forgot-password", forgotPassword);
 
 // B2: define API change password
-authRoutes.post("/change-pass", changePassword);
+authRoutes.post("/change-password", changePassword);
+
+// define API extend-token
+authRoutes.post("/extend-token", extendToken);
 
 export default authRoutes;
