@@ -1,8 +1,19 @@
 import express from "express";
-import { getLike } from "../controllers/likeControllers.js";
+import {
+  getLike,
+  removeLike,
+  getLikeByResId,
+  getLikeByUserId,
+} from "../controllers/likeControllers.js";
 
 const likeRoutes = express.Router();
 
-likeRoutes.post("/get-like", getLike);
+likeRoutes.post("/liked", getLike);
+
+likeRoutes.delete("/unlike", removeLike);
+
+likeRoutes.get("/get-like-by-res/:resId", getLikeByResId);
+
+likeRoutes.get("/get-like-by-user/:userId", getLikeByUserId);
 
 export default likeRoutes;
