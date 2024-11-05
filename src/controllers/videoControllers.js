@@ -13,8 +13,8 @@ const getVideos = async (req, res) => {
     let size = 4;
     let index = (page - 1) * size;
     let data = await model.video.findAll({
-      offset: index,
-      limit: size,
+      offset: index, // prisma: skip
+      limit: size, // prisma: take
     });
     // vd : page: 2, limit: 4
     // bỏ 4 item đầu tiên, lấy 4 item tiếp theo

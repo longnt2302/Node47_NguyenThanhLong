@@ -5,9 +5,13 @@ import transporter from "../config/transporter.js";
 import jwt from "jsonwebtoken"; // lib tạo token
 import { createRefToken, createToken } from "../config/jwt.js";
 import crypto from "crypto"; // lib tạo code forgot password
+import { PrismaClient } from "@prisma/client";
 
 // tạo object model đại diện cho tất cả model của ORM
 const model = initModels(sequelize);
+
+// tạo object model đại diện cho tất cả model của ORM bằng Prisma
+const prisma = new PrismaClient();
 
 const signUp = async (req, res) => {
   try {
@@ -15,10 +19,16 @@ const signUp = async (req, res) => {
     let { full_name, email, pass_word } = req.body;
 
     // kiểm tra email có tồn tại trong DB không ?
-    let checkUser = await model.users.findOne({
-      where: {
-        email,
-      },
+    // sử dụng Sequelize
+    // let checkUser = await model.users.findOne({
+    //   where: {
+    //     email,
+    //   },
+    // });
+
+    // sử dụng Prisma
+    let checkUser = await prisma.users.findFirst({
+      where: { email },
     });
 
     // code theo hướng fail first: bắt những case lỗi trước
@@ -32,10 +42,17 @@ const signUp = async (req, res) => {
      * update => update
      * remove => destroy
      */
-    await model.users.create({
-      full_name,
-      email,
-      pass_word: bcrypt.hashSync(pass_word, 10),
+    // await model.users.create({
+    //   full_name,
+    //   email,
+    //   pass_word: bcrypt.hashSync(pass_word, 10),
+    // });
+    await prisma.users.create({
+      data: {
+        full_name,
+        email,
+        pass_word,
+      },
     });
 
     // send mail
